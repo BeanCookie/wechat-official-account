@@ -1,7 +1,9 @@
 package chatgpt
 
 import (
+	"context"
 	"flag"
+	"os"
 
 	"cn.lzzz.chatgpt/pkg/officialAccount"
 	"github.com/gin-gonic/gin"
@@ -14,9 +16,9 @@ func init() {
 	flag.Parse()
 }
 
-//Run 程序入口
+// Run 程序入口
 func Run() error {
-	log.Info("start wechat sdk example project")
+	log.Info("start wechat sdk chatgpt project")
 
 	r := gin.Default()
 
@@ -44,16 +46,22 @@ func Run() error {
 	return r.Run()
 }
 
-//Index 显示首页
+// Index 显示首页
 func Index(c *gin.Context) {
 	c.JSON(200, "index")
 }
 
-//InitWechat 获取wechat实例
-//在这里已经设置了全局cache，则在具体获取公众号/小程序等操作实例之后无需再设置，设置即覆盖
+// InitWechat 获取wechat实例
+// 在这里已经设置了全局cache，则在具体获取公众号/小程序等操作实例之后无需再设置，设置即覆盖
 func InitWechat() *wechat.Wechat {
 	wc := wechat.NewWechat()
-	cache := &cache.Memcache{}
-	wc.SetCache(cache)
+	redisHost := os.Getenv("REDIS_HOST")
+	redisPassword := os.Getenv("REDIS_PASSWORD")
+	redisOpts := &cache.RedisOpts{
+		Host:     redisHost,
+		Password: redisPassword,
+	}
+	redisCache := cache.NewRedis(context.Background(), redisOpts)
+	wc.SetCache(redisCache)
 	return wc
 }
