@@ -1,8 +1,14 @@
 package officialAccount
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
+	"fmt"
 	"os"
+	"sort"
+	"strings"
 
+	"cn.lzzz.chatgpt/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat/v2"
 	"github.com/silenceper/wechat/v2/officialaccount"
@@ -11,13 +17,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//ExampleOfficialAccount 公众号操作样例
+// ExampleOfficialAccount 公众号操作样例
 type ExampleOfficialAccount struct {
 	wc              *wechat.Wechat
 	officialAccount *officialaccount.OfficialAccount
 }
 
-//ExampleOfficialAccount new
+// ExampleOfficialAccount new
 func NewExampleOfficialAccount(wc *wechat.Wechat) *ExampleOfficialAccount {
 	//init config
 	appID := os.Getenv("APP_ID")
@@ -36,7 +42,7 @@ func NewExampleOfficialAccount(wc *wechat.Wechat) *ExampleOfficialAccount {
 	}
 }
 
-//Serve 处理消息
+// Serve 处理消息
 func (ex *ExampleOfficialAccount) Serve(c *gin.Context) {
 	// 传入request和responseWriter
 	server := ex.officialAccount.GetServer(c.Request, c.Writer)
@@ -80,4 +86,22 @@ func (ex *ExampleOfficialAccount) Serve(c *gin.Context) {
 		log.Error("Send Error, err=%+v", err)
 		return
 	}
+}
+
+func (ex *ExampleOfficialAccount) GetToken(c *gin.Context) {
+	signature := c.Query("signature")
+	timestamp := c.Query("timestamp")
+	nonce := c.Query("nonce")
+	echostr := c.Query("echostr")
+	fmt.Println(signature, timestamp, nonce, echostr)
+
+	token := os.Getenv("TOKEN")
+	data := []string{token, timestamp, nonce}
+	sort.Strings(data)
+
+	temp := strings.Join(data, "")
+	sha1 := sha1.New()
+	sha1.Write([]byte(temp))
+	hashcode := hex.EncodeToString(sha1.Sum(nil))
+	util.RenderSuccess(c, hashcode)
 }
