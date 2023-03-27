@@ -27,10 +27,11 @@ func Run() error {
 
 	//公众号例子相关操作
 	exampleOffAccount := officialAccount.NewExampleOfficialAccount(wc)
+	//
+	r.GET("/wx", exampleOffAccount.CheckToken)
 	//处理推送消息以及事件
 	r.Any("/api/v1/serve", exampleOffAccount.Serve)
 	//获取ak
-	r.GET("/api/v1/get_token", exampleOffAccount.GetToken)
 	r.GET("/api/v1/oa/basic/get_access_token", exampleOffAccount.GetAccessToken)
 	//获取微信callback IP
 	r.GET("/api/v1/oa/basic/get_callback_ip", exampleOffAccount.GetCallbackIP)

@@ -2,7 +2,6 @@ package officialAccount
 
 import (
 	"crypto/sha1"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"sort"
@@ -88,7 +87,7 @@ func (ex *ExampleOfficialAccount) Serve(c *gin.Context) {
 	}
 }
 
-func (ex *ExampleOfficialAccount) GetToken(c *gin.Context) {
+func (ex *ExampleOfficialAccount) CheckToken(c *gin.Context) {
 	signature := c.Query("signature")
 	timestamp := c.Query("timestamp")
 	nonce := c.Query("nonce")
@@ -96,16 +95,15 @@ func (ex *ExampleOfficialAccount) GetToken(c *gin.Context) {
 	fmt.Println(signature, timestamp, nonce, echostr)
 
 	token := os.Getenv("TOKEN")
-	data := []string{token, timestamp, nonce}
-	sort.Strings(data)
 
-	temp := strings.Join(data, "")
-	sha1 := sha1.New()
-	sha1.Write([]byte(temp))
-	hashcode := hex.EncodeToString(sha1.Sum(nil))
-	if hashcode == signature {
-		util.RenderSuccess(c, echostr)
+	tmpArr := []string{token, timestamp, nonce}
+	sort.Strings(tmpArr)
+	tmpStr := strings.Join(tmpArr, "")
+	tmpStr = fmt.Sprintf("%x", sha1.Sum([]byte(tmpStr)))
+
+	if tmpStr == signature {
+		util.RenderSuccess(c, true)
 	} else {
-		util.RenderSuccess(c, "Get Token Error")
+		util.RenderSuccess(c, false)
 	}
 }
