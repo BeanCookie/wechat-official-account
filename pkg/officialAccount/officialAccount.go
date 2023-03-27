@@ -1,13 +1,8 @@
 package officialAccount
 
 import (
-	"crypto/sha1"
-	"fmt"
 	"os"
-	"sort"
-	"strings"
 
-	"cn.lzzz.chatgpt/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat/v2"
 	"github.com/silenceper/wechat/v2/officialaccount"
@@ -88,22 +83,5 @@ func (ex *ExampleOfficialAccount) Serve(c *gin.Context) {
 }
 
 func (ex *ExampleOfficialAccount) CheckToken(c *gin.Context) {
-	signature := c.Query("signature")
-	timestamp := c.Query("timestamp")
-	nonce := c.Query("nonce")
-	echostr := c.Query("echostr")
-	fmt.Println(signature, timestamp, nonce, echostr)
-
-	token := os.Getenv("TOKEN")
-
-	tmpArr := []string{token, timestamp, nonce}
-	sort.Strings(tmpArr)
-	tmpStr := strings.Join(tmpArr, "")
-	tmpStr = fmt.Sprintf("%x", sha1.Sum([]byte(tmpStr)))
-
-	if tmpStr == signature {
-		util.RenderSuccess(c, echostr)
-	} else {
-		util.RenderSuccess(c, "Check Token Error")
-	}
+	c.Writer.WriteString(c.Query("echostr"))
 }

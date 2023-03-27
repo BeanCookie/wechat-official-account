@@ -44,7 +44,6 @@ func Run() error {
 
 	//显示首页
 	r.GET("/", Index)
-
 	return r.Run()
 }
 
