@@ -103,5 +103,7 @@ func (ex *ExampleOfficialAccount) GetToken(c *gin.Context) {
 	sha1 := sha1.New()
 	sha1.Write([]byte(temp))
 	hashcode := hex.EncodeToString(sha1.Sum(nil))
-	util.RenderSuccess(c, hashcode)
+	if hashcode == signature {
+		util.RenderSuccess(c, echostr)
+	}
 }
