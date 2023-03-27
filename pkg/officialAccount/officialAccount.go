@@ -102,8 +102,8 @@ func (ex *ExampleOfficialAccount) CheckToken(c *gin.Context) {
 	tmpStr = fmt.Sprintf("%x", sha1.Sum([]byte(tmpStr)))
 
 	if tmpStr == signature {
-		util.RenderSuccess(c, true)
+		util.RenderSuccess(c, echostr)
 	} else {
-		util.RenderSuccess(c, false)
+		util.RenderSuccess(c, "Check Token Error")
 	}
 }
