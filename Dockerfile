@@ -1,4 +1,4 @@
-FROM golang:1.8-alpine
+FROM golang:1.20-alpine
 
 # 安装必要的工具和依赖
 RUN apk update && apk add --no-cache git
